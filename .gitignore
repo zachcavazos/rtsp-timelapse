@@ -1,0 +1,10 @@
+__pycache__
+utils/
+venv/
+nursery/*
+living-room/*
+output/
+config.py
+
+token.json
+client_secret.json
