@@ -1,16 +1,17 @@
 # RTSP Timelapse
-
-Connects to an RTSP stream, takes a photo, and stitches it together to make a timelapse.
-Then sends a the timelapse video to your favourite service [using Apprise](https://github.com/caronc/apprise).
+*Adapted from git@github.com:zachcavazos/rtsp-timelapse.git
+Supports connecting to an rtsp stream, capturing a photo, stiching those photos into a timelapse with ffmpeg
+and uploading that timelapse to a Google Photos Album. It will also send a message to your favourite service
+ [using Apprise](https://github.com/caronc/apprise) with confirmation or an error notification.
 
 ## Hardware
-- Personally, I have this running on a Raspberry Pi (any model will probably do)
+- Personally, I have this running on a Raspberry Pi5 (4GB RAM)
 - An IP camera that supports RTSP
 
 ## Installation
 - Create a python3 virtual environment and install the project's requirements:
 ```
-$ python3 -m venv rtsp_timelapse
+$ python3 -m venv venv
 $ source rtsp_timelapse/bin/activate
 (rtsp_timelapse) $ pip install -r requirements.txt
 ```
@@ -33,6 +34,9 @@ apprise_services = [
     "discord://webhook_id/webhook_token",
 ]
 ```
+
+Create a file `config.py` based on `example_config.py` with your desired camera/album/and service configuration.
+
 - You should now be able to start the program:
 ```
 (rtsp_timelapse) $ python main.py
@@ -42,11 +46,16 @@ apprise_services = [
 The script is intended to be run regularly on a cronjob.  It will connect to the IP camera, take a photo 
 and save the image to the **input** folder.
 
-Once a week's worth of photos have been taken, the script will stitch the photos together using
-[ffmpeg](https://ffmpeg.org/) and save the video to the **output** directory.  Once saved, it will send the videos to
-the Apprise services set in config.py.  The images used to create the timelapse will then be
-deleted.
-
-Two copies of the timelapse will be created in the **output** directory.
-- normal_timelapse - This contains timelapses at the default framerate - 24fps
-- forced_fps - This contains timelapses at a framerate of 60fps
+# Crontab Config
+Below is an example of my current crontab, which is set up to take photos at regular intervals, before 
+compiling those photos and taking the actions described above.
+```
+* 20-23,0-7 * * *  /bin/bash -c 'source /home/cavazos/src/rtsp-timelapse/venv/bin/activate &&  /home/cavazos/src/rtsp-timelapse/venv/bin/python /home/cavazos/src/rtsp-timelapse/capture_frame.py nursery'
+0 8 * * * /bin/bash -c 'source /home/cavazos/src/rtsp-timelapse/venv/bin/activate &&  /home/cavazos/src/rtsp-timelapse/venv/bin/python /home/cavazos/src/rtsp-timelapse/main.py nursery'
+* 9-16 * * * /bin/bash -c 'source /home/cavazos/src/rtsp-timelapse/venv/bin/activate && /home/cavazos/src/rtsp-timelapse/venv/bin/python /home/cavazos/src/rtsp-timelapse/capture_frame.py living-room'
+0 17 * * * /bin/bash -c 'source /home/cavazos/src/rtsp-timelapse/venv/bin/activate && /home/cavazos/src/rtsp-timelapse/venv/bin/python /home/cavazos/src/rtsp-timelapse/main.py living-room'
+0 0 1,15 * * /bin/bash -c 'source /home/cavazos/src/rtsp-timelapse/venv/bin/activate && /home/cavazos/src/rtsp-timelapse/venv/bin/python /home/cavazos/src/rtsp-timelapse/delete_output.py'
+```
+Note that the files accept a command line argument for which camera config to use, and which input file
+location to look for the images in
+I also have a delete function separately that is called at regular intervals to remove the output files

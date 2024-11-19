@@ -1,3 +1,4 @@
+TIMELAPSE_ALBUM = 'Timelapses'
 camera_config = {
     "nursery": {
         "rtsp_username": "USERNAME",
