@@ -6,6 +6,7 @@ living-room/*
 output/
 config.py
 
+album.json
 token.json
 client_secret.json
 *.json
