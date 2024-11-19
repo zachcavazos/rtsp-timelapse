@@ -1,5 +1,6 @@
 # RTSP Timelapse
-*Adapted from git@github.com:zachcavazos/rtsp-timelapse.git
+- Adapted from https://github.com/AlanCunningham/rtsp-timelapse
+
 Supports connecting to an rtsp stream, capturing a photo, stiching those photos into a timelapse with ffmpeg
 and uploading that timelapse to a Google Photos Album. It will also send a message to your favourite service
  [using Apprise](https://github.com/caronc/apprise) with confirmation or an error notification.
@@ -42,11 +43,11 @@ Create a file `config.py` based on `example_config.py` with your desired camera/
 (rtsp_timelapse) $ python main.py
 ```
 
-# Creating the timelapses
+## Creating the timelapses
 The script is intended to be run regularly on a cronjob.  It will connect to the IP camera, take a photo 
 and save the image to the **input** folder.
 
-# Crontab Config
+## Crontab Config
 Below is an example of my current crontab, which is set up to take photos at regular intervals, before 
 compiling those photos and taking the actions described above.
 ```
