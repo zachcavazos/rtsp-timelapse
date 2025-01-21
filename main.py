@@ -84,12 +84,14 @@ def create_media_item(upload_token, album_id, creds):
 
 def get_album_id(album_title, creds):
     root_path = '/home/cavazos/src/rtsp-timelapse/'
-    with open(root_path + 'album.json', 'r') as f:
-        album_details = json.load(f)
-        if album_title in album_details:
-            print('Album created in a previous run!')
-            return album_details[album_title]
-    
+    try:
+        with open(root_path + 'album.json', 'r') as f:
+            album_details = json.load(f)
+            if album_title in album_details:
+                print('Album created in a previous run!')
+                return album_details[album_title]
+    except FileNotFoundError:
+        print('album.json does not exist, creating')
     create_album = 'https://photoslibrary.googleapis.com/v1/albums'
     headers = {'Authorization': f'Bearer {creds.token}', 'Content-type': 'application/json'}
     response = requests.post(create_album, headers=headers, json={'album': {'title': album_title}})
@@ -99,7 +101,7 @@ def get_album_id(album_title, creds):
         print(f'Error creating album: {response.text}')
     
     with open(root_path + 'album.json', 'w') as f:
-        album_details[album_title] = response.json().get('id')
+        album_details = {'album_title': response.json().get('id')}
         json.dump(album_details, f)
     return response.json().get('id')
 

@@ -1,5 +1,6 @@
 import config
 import glob
+import os
 import subprocess
 import sys
 
@@ -7,9 +8,12 @@ from datetime import datetime
 from pathlib import Path
 
 
-absolute_path = "/home/cavazos/src/rtsp-timelapse"
-timelapse_directory = f"{absolute_path}/output"
+UID = 1000
+GID = 1002
 
+absolute_path = "/home/cavazos/src/rtsp-timelapse"
+# timelapse_directory = f"{absolute_path}/output"
+timelapse_directory = "/mnt/hd1/data/cavazos/files/Timelapses"
 
 def create_timelapse(camera_name='nursery'):
     images_directory = f'{absolute_path}/{config.camera_config[camera_name]["directory"]}'
@@ -32,7 +36,8 @@ def create_timelapse(camera_name='nursery'):
         print(f'Failed to create timelapse, check input directory')
         return None
     else:
-        print(f'wrote file successfully {timelapse_filepath}')
+        print(f'wrote file successfully {timelapse_filepath}, updating owner')
+        os.chown(timelapse_filepath, UID, GID)
     return timelapse_filepath
 
 
